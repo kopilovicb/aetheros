@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import AuthProvider from "@/components/layout/AuthProvider";
-import { BottomNav } from "@/components/layout/BottomNav";
 import { ErrorBoundary } from "@/components/layout/ErrorBoundary";
 import { InstallPrompt } from "@/components/layout/InstallPrompt";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { NavigationWrapper } from "@/components/layout/NavigationWrapper";
 import "./globals.css";
 
 const inter = Inter({
@@ -38,11 +37,9 @@ export default function RootLayout({
       </head>
       <body className="flex min-h-full flex-col bg-[#0a0a0a] text-foreground">
         <AuthProvider>
-          <Sidebar />
-          <div className="min-h-screen pb-20 md:ml-60 md:pb-0">
+          <NavigationWrapper>
             <ErrorBoundary>{children}</ErrorBoundary>
-          </div>
-          <BottomNav />
+          </NavigationWrapper>
           <InstallPrompt />
         </AuthProvider>
       </body>

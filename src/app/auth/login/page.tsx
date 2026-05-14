@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,8 +13,23 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      const rememberedEmail = localStorage.getItem("aetheros_remembered_email");
+
+      if (rememberedEmail) {
+        setEmail(rememberedEmail);
+      }
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -30,6 +45,12 @@ export default function LoginPage() {
       if (error) {
         setErrorMessage(error.message);
         return;
+      }
+
+      if (rememberMe) {
+        localStorage.setItem("aetheros_remembered_email", email);
+      } else {
+        localStorage.removeItem("aetheros_remembered_email");
       }
 
       console.log("redirecting to /");
@@ -77,6 +98,16 @@ export default function LoginPage() {
               onChange={(event) => setPassword(event.target.value)}
             />
           </div>
+
+          <label className="flex min-h-11 items-center gap-3 text-sm text-[#9ca3af]">
+            <input
+              checked={rememberMe}
+              className="h-5 w-5 accent-[#6366f1]"
+              type="checkbox"
+              onChange={(event) => setRememberMe(event.target.checked)}
+            />
+            <span>Remember me</span>
+          </label>
 
           {errorMessage ? (
             <p className="text-sm text-red-400">{errorMessage}</p>
