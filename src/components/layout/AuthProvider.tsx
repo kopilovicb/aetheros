@@ -100,19 +100,21 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       setIsLoading(true);
       const { data, error } = await getSession();
 
-      if (isMounted && !error) {
+      if (!isMounted) {
+        return;
+      }
+
+      if (!error && data) {
+        setUser(data.user);
         setSession(data);
-        setUser(data?.user ?? null);
-
-        if (data) {
-          startBackgroundSync();
-          void schedulePermittedNotifications();
-        }
+        startBackgroundSync();
+        void schedulePermittedNotifications();
+      } else {
+        setUser(null);
+        setSession(null);
       }
 
-      if (isMounted) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     };
 
     void bootstrapSession();
@@ -120,14 +122,16 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-
       if (session) {
+        setUser(session.user);
+        setSession(session);
+        setIsLoading(false);
         startBackgroundSync();
         void schedulePermittedNotifications();
       } else {
+        setUser(null);
+        setSession(null);
+        setIsLoading(false);
         stopBackgroundSync();
       }
     });

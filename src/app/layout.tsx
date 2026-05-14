@@ -37,9 +37,10 @@ export default function RootLayout({
       </head>
       <body className="flex min-h-full flex-col bg-[#0a0a0a] text-foreground">
         <AuthProvider>
-          <NavigationWrapper>
+          <NavigationWrapper />
+          <div className="min-h-screen pb-20 md:ml-60 md:pb-0">
             <ErrorBoundary>{children}</ErrorBoundary>
-          </NavigationWrapper>
+          </div>
           <InstallPrompt />
         </AuthProvider>
       </body>

@@ -53,8 +53,9 @@ export default function LoginPage() {
         localStorage.removeItem("aetheros_remembered_email");
       }
 
-      console.log("redirecting to /");
-      router.push("/");
+      console.log("redirecting to /dashboard");
+      router.refresh();
+      router.push("/dashboard");
     } catch (error) {
       console.log("caught error:", error);
       setErrorMessage(

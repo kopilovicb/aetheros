@@ -38,6 +38,7 @@ export function Sidebar() {
 
   const handleSignOut = async () => {
     await signOut();
+    router.refresh();
     router.push("/auth/login");
   };
 
