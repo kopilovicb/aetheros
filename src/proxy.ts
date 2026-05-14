@@ -10,10 +10,15 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const token = request.cookies.get('sb-access-token')?.value ||
-    request.cookies.get(`sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('.')[0].split('//')[1]}-auth-token`)?.value
+  // Check all cookies for any Supabase auth token
+  const cookies = request.cookies.getAll()
+  const hasAuthCookie = cookies.some(cookie =>
+    cookie.name.includes('auth-token') ||
+    cookie.name.includes('sb-') ||
+    cookie.name === 'supabase-auth-token'
+  )
 
-  if (!token) {
+  if (!hasAuthCookie) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
