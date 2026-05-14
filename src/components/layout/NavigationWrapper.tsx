@@ -11,7 +11,7 @@ export function NavigationWrapper() {
     return null;
   }
 
-  if (!user) {
+  if (user === null) {
     return null;
   }
 

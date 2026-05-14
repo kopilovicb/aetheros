@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/supabase/auth";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
@@ -33,14 +31,14 @@ export default function LoginPage() {
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("handleSubmit called");
+    console.log("login form submit");
     setIsSubmitting(true);
     setErrorMessage(null);
 
     try {
-      console.log("calling signIn with:", email);
+      console.log("login signIn call", { email });
       const { error } = await signIn(email, password);
-      console.log("signIn result:", { error });
+      console.log("login signIn result", { error });
 
       if (error) {
         setErrorMessage(error.message);
@@ -53,9 +51,8 @@ export default function LoginPage() {
         localStorage.removeItem("aetheros_remembered_email");
       }
 
-      console.log("redirecting to /dashboard");
-      router.refresh();
-      router.push("/dashboard");
+      console.log("login redirect attempt", { destination: "/dashboard" });
+      window.location.href = "/dashboard";
     } catch (error) {
       console.log("caught error:", error);
       setErrorMessage(

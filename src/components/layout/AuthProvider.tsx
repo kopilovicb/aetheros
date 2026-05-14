@@ -98,41 +98,57 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
     const bootstrapSession = async () => {
       setIsLoading(true);
-      const { data, error } = await getSession();
 
-      if (!isMounted) {
-        return;
+      try {
+        const { data, error } = await getSession();
+
+        if (!isMounted) {
+          return;
+        }
+
+        if (!error && data) {
+          setUser(data.user);
+          setSession(data);
+          startBackgroundSync();
+          void schedulePermittedNotifications();
+        } else {
+          setUser(null);
+          setSession(null);
+          stopBackgroundSync();
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
-
-      if (!error && data) {
-        setUser(data.user);
-        setSession(data);
-        startBackgroundSync();
-        void schedulePermittedNotifications();
-      } else {
-        setUser(null);
-        setSession(null);
-      }
-
-      setIsLoading(false);
     };
 
     void bootstrapSession();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        setUser(null);
+        setSession(null);
+        setIsLoading(false);
+        stopBackgroundSync();
+        return;
+      }
+
+      if (event === "SIGNED_IN" && session) {
         setUser(session.user);
         setSession(session);
         setIsLoading(false);
         startBackgroundSync();
         void schedulePermittedNotifications();
-      } else {
+        return;
+      }
+
+      if (!session) {
         setUser(null);
         setSession(null);
         setIsLoading(false);
-        stopBackgroundSync();
       }
     });
 
